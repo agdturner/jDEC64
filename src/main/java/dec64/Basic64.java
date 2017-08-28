@@ -78,7 +78,7 @@ public final class Basic64 {
             return DEC64_ZERO;
         // Fast path
         boolean overflow = overflow(coeff);
-        if (exponent <= 127 && exponent <= -128) {
+        if (exponent <= 127 && exponent >= -128) {
             if (!overflow)
                 return (coeff << 8) | exponentAsLong((byte) exponent);
         }
@@ -299,7 +299,7 @@ public final class Basic64 {
         if (expa == expb) {
             return divideLevel(level(a), level(b));
         }
-        long outMult = of(1, expa - expb);
+        long outMult = of(1, (long)(expa - expb));
 
         return multiply(divideLevel(level(a), level(b)), outMult);
     }
@@ -315,7 +315,7 @@ public final class Basic64 {
     long divideLevel(@DEC64 long a, @DEC64 long b) {
         long coeffa = coefficient(a);
         long coeffb = coefficient(b);
-        byte exp = 0;
+        long exp = 0;
 
         long ratio = coeffa / coeffb;
         long remainder = coeffa % coeffb;
