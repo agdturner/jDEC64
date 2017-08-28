@@ -12,9 +12,6 @@ public final class Basic64 {
     // Max and min coefficients - not DEC64 values - should not be neded outside the library
     final static long DEC64_MAX_COEFFICIENT = 0x7f_ffff_ffff_ffffL; // 36_028_797_018_963_967L
     final static long DEC64_MIN_COEFFICIENT = -36_028_797_018_963_968L; // -0x80_0000_0000_0000L
-    final static long MAX_PROMOTABLE = 0x7f_ffff_ffff_ffffL; // 36_028_797_018_963_967L
-
-    final static long MIN_PROMOTABLE = 0xff_ffff_ffff_ffffL;
 
     private final static long DEC64_EXPONENT_MASK = 0xFFL;
     private final static long DEC64_COEFFICIENT_MASK = 0xffff_ffff_ffff_ff00L;
@@ -50,6 +47,22 @@ public final class Basic64 {
 
     public static boolean overflow(long number) {
         return (number & DEC64_COEFFICIENT_OVERFLOW_MASK) != 0;
+    }
+
+    public static byte digits(@DEC64 long number) {
+        if (isNaN(number)) {
+            return -1;
+        }
+        if (isZero(number)) {
+            return 0;
+        }
+        byte out = 0;
+        long coeff = coefficient(abs(number));
+        while (coeff > 0) {
+            coeff = coeff / 10L;
+            out++;
+        }
+        return out;
     }
 
     public static @DEC64
@@ -110,7 +123,7 @@ public final class Basic64 {
         long out = number;
         long coeff = coefficient(number);
         if (exp > 0) {
-            while (exp > 0 && coeff < MAX_PROMOTABLE) {
+            while (exp > 0 && coeff < DEC64_MAX_COEFFICIENT) {
                 out = of(10 * coeff, --exp);
                 coeff = coefficient(out);
             }
@@ -255,6 +268,12 @@ public final class Basic64 {
         return of(coeff, (byte) (exponent(a) + exponent(b)));
     }
 
+    /**
+     * 
+     * @param a
+     * @param b
+     * @return 
+     */
     public static @DEC64
     long divide_new(@DEC64 long a, @DEC64 long b) {
         if (isNaN(a) || isNaN(b))
@@ -301,7 +320,7 @@ public final class Basic64 {
         long ratio = coeffa / coeffb;
         long remainder = coeffa % coeffb;
         while (remainder > 0) {
-            if (coeffa * 10 > MAX_PROMOTABLE) {
+            if (coeffa * 10 > DEC64_MAX_COEFFICIENT) {
                 break;
             }
             coeffa *= 10;

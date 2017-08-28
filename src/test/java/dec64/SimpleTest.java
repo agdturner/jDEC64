@@ -18,6 +18,11 @@ import org.junit.Ignore;
 public class SimpleTest {
 
     @Test
+    public void simpleNew() {
+        assertFalse("Should be able to increase coefficient", isNaN(of(100L, 129L)));
+    }
+
+    @Test
     public void simpleAdd() {
         assertEquals("-1 + 1 should equal 0", DEC64_ZERO, add(DEC64_ONE, DEC64_NEGATIVE_ONE));
 
@@ -28,6 +33,18 @@ public class SimpleTest {
 
         @DEC64 long hundred = of(10, (byte) 1);
         assertTrue("100 + 10 should equal 110", equals64(of(110, (byte) 0), add(hundred, ten)));
+    }
+
+    @Test
+    public void confirm_simple_digit_behaviour() {
+        assertEquals("1 has 1 digit", 1, digits(DEC64_ONE));
+        assertEquals("2 has 1 digit", 1, digits(DEC64_TWO));
+        assertEquals("23 has 2 digits", 2, digits(of(23L, 0)));
+        assertEquals("1337 has 4 digits", 4, digits(of(1337L, 0)));
+        assertEquals("-1 has 1 digit", 1, digits(DEC64_NEGATIVE_ONE));
+        assertEquals("0.5 has 1 digit", 1, digits(DEC64_HALF));
+        assertEquals("0.1 has 1 digit", 1, digits(DEC64_POINT_ONE));
+        assertEquals("1 / 3 has 15 digits", 15, digits(DEC64_THIRD));
     }
 
     @Test
@@ -81,8 +98,6 @@ public class SimpleTest {
 //
 //        outMsg = "5.191176470 / 3.0955882352 was " + STANDARD.format(actual) + " (" + actual + ") instead of " + STANDARD.format(expected);
 //        assertTrue(outMsg, equals64(expected, actual));
-
-        
         // 5.191176470588235 / 3.0955882352941175 == 1.676959619952494        
         fiveAndABit = of(5_191_176_470_588_235L, (byte) -15);
         threeAndABit = of(3_095_588_235_294_117_5L, (byte) -16);
@@ -141,7 +156,7 @@ public class SimpleTest {
         assertTrue("-1 = (0)--", equals64(dec(DEC64_ZERO), DEC64_NEGATIVE_ONE));
 
         for (byte exp = 1; exp < Byte.MAX_VALUE; exp++) {
-            @DEC64 long large = of(MAX_PROMOTABLE, exp);
+            @DEC64 long large = of(DEC64_MAX_COEFFICIENT, exp);
             assertTrue("inc on large number should return same number", equals64(inc(large), large));
         }
 
@@ -156,7 +171,7 @@ public class SimpleTest {
             current = multiply(of(i, 0), current);
             assertTrue(i + "! value incorrect", equals64(FACTORIAL[i], current));
         }
-        assertEquals(3602879701896396L, MAX_PROMOTABLE / 10L);
+        assertEquals(3602879701896396L, DEC64_MAX_COEFFICIENT / 10L);
     }
 
     @Test
