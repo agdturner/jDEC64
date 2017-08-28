@@ -10,10 +10,11 @@ import static dec64.Constants64.*;
 public final class Basic64 {
 
     // Max and min coefficients - not DEC64 values - should not be neded outside the library
+    final static long DEC64_MAX_COEFFICIENT = 0x7f_ffff_ffff_ffffL; // 36_028_797_018_963_967L
+    final static long DEC64_MIN_COEFFICIENT = -36_028_797_018_963_968L; // -0x80_0000_0000_0000L
     final static long MAX_PROMOTABLE = 0x7f_ffff_ffff_ffffL; // 36_028_797_018_963_967L
 
     final static long MIN_PROMOTABLE = 0xff_ffff_ffff_ffffL;
-    final static long DEC64_MIN_ABS_COEFFICIENT = -36028797018963968L; // 0x80_0000_0000_0000L
 
     private final static long DEC64_EXPONENT_MASK = 0xFFL;
     private final static long DEC64_COEFFICIENT_MASK = 0xffff_ffff_ffff_ff00L;
@@ -26,7 +27,8 @@ public final class Basic64 {
     }
 
     /**
-     *
+     * Returns the coefficient of a DEC64 number as a long. 
+     * The value will be 56 bits long and 
      * @param number
      * @return 
      */
@@ -42,15 +44,12 @@ public final class Basic64 {
         return ((long) exp & DEC64_EXPONENT_MASK);
     }
 
-    public static boolean overflow(long number) {
-        return (number & DEC64_COEFFICIENT_OVERFLOW_MASK) != 0;
+    public static long exponentAsLong(long exp) {
+        return ((long) exp & DEC64_EXPONENT_MASK);
     }
 
-    public static @DEC64
-    long of(long coeff, long exponent) {
-        if (exponent > 127 || exponent < -127)
-            return DEC64_NAN;
-        return of(coeff, (byte) exponent);
+    public static boolean overflow(long number) {
+        return (number & DEC64_COEFFICIENT_OVERFLOW_MASK) != 0;
     }
 
     public static @DEC64
@@ -58,6 +57,36 @@ public final class Basic64 {
         if (overflow(coeff))
             return DEC64_NAN;
         return (coeff << 8) | exponentAsLong(exponent);
+    }
+
+    public static @DEC64
+    long of(long coeff, long exponent) {
+        if (coeff == 0L)
+            return DEC64_ZERO;
+        // Fast path
+        boolean overflow = overflow(coeff);
+        if (exponent <= 127 && exponent <= -128) {
+            if (!overflow)
+                return (coeff << 8) | exponentAsLong((byte) exponent);
+        }
+        // Need to attempt salvage...
+        if (exponent > 127) {
+            return pack_decrease(coeff, exponent);
+        }
+
+        return DEC64_NAN;
+    }
+
+    private static long pack_decrease(long coeff, long exponent) {
+        while (exponent > 127) {
+            coeff *= 10;
+            if (overflow(coeff)) {
+                return DEC64_NAN;
+            } else {
+                exponent--;
+            }
+        }
+        return (coeff << 8) | exponentAsLong((byte) exponent);
     }
 
     public static @DEC64
@@ -291,7 +320,7 @@ public final class Basic64 {
         @DEC64 long coeff = coefficient(number);
         if (coeff >= 0)
             return number;
-        if (coeff > DEC64_MIN_ABS_COEFFICIENT)
+        if (coeff > DEC64_MIN_COEFFICIENT)
             return of(-coeff, exponent(number));
         return DEC64_NAN;
     }
@@ -353,7 +382,7 @@ public final class Basic64 {
         if (isNaN(number))
             return DEC64_NAN;
         @DEC64 long coeff = coefficient(number);
-        if (coeff > DEC64_MIN_ABS_COEFFICIENT)
+        if (coeff > DEC64_MIN_COEFFICIENT)
             return of(-coeff, exponent(number));
         return DEC64_NAN;
     }
