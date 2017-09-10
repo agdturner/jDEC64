@@ -78,7 +78,7 @@ public class SimpleTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void complex_divide() {
         // 5.191 / 3.0955
         @DEC64 long fiveAndABit = of(5_191L, (byte) -3);

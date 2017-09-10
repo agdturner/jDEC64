@@ -12,7 +12,7 @@ public class Constants64 {
     public final static @DEC64 long DEC64_ZERO = 0x00L;
     public final static @DEC64 long DEC64_ONE = 0x100L;
     public static final @DEC64 long DEC64_TWO = 0x200L;
-
+    // 0xA00L or 0x101L 
     
     public final static @DEC64 long DEC64_NEGATIVE_ONE = 0xffff_ffff_ffff_ff00L;
     public final static @DEC64 long DEC64_POINT_ONE = 0x1FFL;

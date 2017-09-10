@@ -156,6 +156,8 @@ public final class Basic64 {
     public static boolean equals64(@DEC64 long a, @DEC64 long b) {
         if (isNaN(a) || isNaN(b))
             return false; // NaN != NaN
+        if (a == b)
+            return true;
         byte expa = exponent(a);
         byte expb = exponent(b);
         if (expa == expb) {
