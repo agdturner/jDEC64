@@ -233,6 +233,9 @@ public final class Basic64 {
 
     public static @DEC64
     long multiply(@DEC64 long a, @DEC64 long b) {
+        if (isZero(a) || isZero(b)) {
+            return DEC64_ZERO;
+        }
         if (isNaN(a) || isNaN(b))
             return DEC64_NAN;
         final long coeff = coefficient(a) * coefficient(b);
