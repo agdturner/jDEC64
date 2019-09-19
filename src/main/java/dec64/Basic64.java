@@ -251,6 +251,8 @@ public final class Basic64 {
     long divide(@DEC64 long a, @DEC64 long b) {
         if (isNaN(a) || isNaN(b))
             return DEC64_NAN;
+        if (coefficient(a) == 0)
+            return DEC64_ZERO;
         if (coefficient(b) == 0)
             return DEC64_NAN;
 
