@@ -123,7 +123,7 @@ public final class Basic64 {
     }
 
     public static boolean isZero(@DEC64 long number) {
-        return coefficient(number) == DEC64_ZERO;
+        return !isNaN(number) && coefficient(number) == DEC64_ZERO;
     }
 
     public static boolean equals64(@DEC64 long a, @DEC64 long b) {
