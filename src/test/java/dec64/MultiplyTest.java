@@ -100,7 +100,9 @@ public class MultiplyTest {
 
     @Test
     public void multiply() {
-        assertEquals(comment, expected, Basic64.multiply(first, second));
+        @DEC64 long result = Basic64.multiply(first, second);
+        System.out.println(String.format("first = 0x%x, second = 0x%x, result = 0x%x", first, second, result));
+        assertEquals(comment, expected, result);
     }
 
     private static @DEC64 long dec64_new(@DEC64 long coeff, @DEC64 long exponent) {
